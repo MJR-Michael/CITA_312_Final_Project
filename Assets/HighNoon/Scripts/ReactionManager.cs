@@ -4,6 +4,7 @@ public class ReactionManager : MonoBehaviour
 {
     private bool npcReacted = false;
     private bool playerReacted = false;
+    private bool early = false;
 
     void Start()
     {
@@ -12,11 +13,12 @@ public class ReactionManager : MonoBehaviour
 
         npc.OnNPCReacted += NPCWins;
         player.OnPlayerReacted += PlayerWins;
+        player.OnPlayerEarly += PlayerReactedTooEarly;
     }
 
     void NPCWins()
     {
-        if (!playerReacted)
+        if (!playerReacted && !early)
         {
             npcReacted = true;
             Debug.Log("NPC wins! Player was too slow!");
@@ -25,10 +27,16 @@ public class ReactionManager : MonoBehaviour
 
     void PlayerWins()
     {
-        if (!npcReacted)
+        if (!npcReacted && !early)
         {
             playerReacted = true;
-            Debug.Log("Player wins! You reacted faster!");
+            Debug.Log("Player wins! Fastest reaction!");
         }
+    }
+
+    void PlayerReactedTooEarly()
+    {
+        early = true;
+        Debug.Log("Player loses! You reacted too early!");
     }
 }

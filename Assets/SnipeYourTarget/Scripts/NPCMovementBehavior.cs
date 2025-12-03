@@ -3,53 +3,62 @@ using UnityEngine.AI;
 
 public class NPCMovementBehavior : MonoBehaviour
 {
-    public BoxCollider wanderArea;
-    public float wanderDelay = 3f;
+    [Header("Wandering Settings")]
+    public float wanderRadius = 60f;        // Max distance NPC can move from spawn
+    public float wanderDelay = 5f;          // Time between picking new destinations
+    public float stoppingDistance = 0.5f;   // How close to the destination before picking a new one
+    public int maxAttempts = 20;            // Max tries to find a valid point on NavMesh
 
-    NavMeshAgent agent;
-    float timer;
+    private NavMeshAgent agent;
+    private Vector3 spawnPosition;
+    private float timer;
+
+    void Awake()
+    {
+        agent = GetComponent<NavMeshAgent>();
+        if (!agent) Debug.LogError("NPCMovementBehavior requires a NavMeshAgent!");
+        spawnPosition = transform.position; // remember spawn point
+    }
 
     void Start()
     {
-        agent = GetComponent<NavMeshAgent>();
+        timer = Random.Range(0f, wanderDelay); // stagger start
         PickNewDestination();
     }
 
     void Update()
     {
+        if (!agent) return;
+
         timer += Time.deltaTime;
 
-        if (timer >= wanderDelay || agent.remainingDistance < 0.5f)
+        if (timer >= wanderDelay || (!agent.pathPending && agent.remainingDistance <= stoppingDistance))
         {
             PickNewDestination();
             timer = 0f;
         }
     }
 
-    public void SetWanderArea(BoxCollider area)
-    {
-        wanderArea = area;
-    }
-
     void PickNewDestination()
     {
-        if (!wanderArea)
-            return;
+        NavMeshHit hit;
+        bool found = false;
 
-        Vector3 point = GetRandomPointInBox(wanderArea);
+        for (int i = 0; i < maxAttempts; i++)
+        {
+            // Pick a random point within a circle (XZ plane) around spawn
+            Vector2 randomCircle = Random.insideUnitCircle * wanderRadius;
+            Vector3 randomPoint = spawnPosition + new Vector3(randomCircle.x, 0f, randomCircle.y);
 
-        agent.SetDestination(point);
-    }
+            if (NavMesh.SamplePosition(randomPoint, out hit, wanderRadius, NavMesh.AllAreas))
+            {
+                agent.SetDestination(hit.position);
+                found = true;
+                break;
+            }
+        }
 
-    Vector3 GetRandomPointInBox(BoxCollider box)
-    {
-        Vector3 center = box.transform.position + box.center;
-        Vector3 size = box.size;
-
-        float x = Random.Range(center.x - size.x / 2, center.x + size.x / 2);
-        float y = Random.Range(center.y - size.y / 2, center.y + size.y / 2);
-        float z = Random.Range(center.z - size.z / 2, center.z + size.z / 2);
-
-        return new Vector3(x, y, z);
+        if (!found)
+            Debug.LogWarning("Could not find a valid NavMesh point for NPC: " + name);
     }
 }

@@ -1,14 +1,10 @@
 using UnityEngine;
-using System.Collections.Generic;
 
 public class NPCSpawnManager : MonoBehaviour
 {
     [Header("Setup")]
-    public GameObject npcBasePrefab;                  // Contains AI, movement, empty slot for model
-    public GameObject[] npcModelPrefabs;              // Visual model prefabs
-    public Transform[] npcSpawnPoints;                // Where NPCs can spawn
-    public Transform modelAttachPoint;                // Where model gets placed on NPC
-    public BoxCollider[] wanderingAreas;                 // NPC movement limits
+    public GameObject npcBasePrefab;          // Base NPC prefab with NavMeshAgent & NPCMovementBehavior
+    public GameObject[] npcModelPrefabs;      // Visual model prefabs
 
     [Header("Counts")]
     public int npcCount = 10;
@@ -17,19 +13,12 @@ public class NPCSpawnManager : MonoBehaviour
     public GameObject targetNPC;
     public GameObject targetModel;
 
-    void Start()
+    /// <summary>
+    /// Spawn NPCs for a specific player area.
+    /// NPCs will wander around their spawn point using wanderRadius in NPCMovementBehavior.
+    /// </summary>
+    public void SpawnNPCs(Vector3 playerSpawnPosition)
     {
-        SpawnNPCs();
-    }
-
-    void SpawnNPCs()
-    {
-        if (npcSpawnPoints.Length == 0)
-        {
-            Debug.LogError("No NPC Spawn Points assigned!");
-            return;
-        }
-
         if (npcModelPrefabs.Length < 2)
         {
             Debug.LogError("Need at least 2 NPC models (1 unique + 1 shared)");
@@ -40,38 +29,41 @@ public class NPCSpawnManager : MonoBehaviour
         GameObject uniqueModel = npcModelPrefabs[Random.Range(0, npcModelPrefabs.Length)];
         targetModel = uniqueModel;
 
-        // Spawn the target NPC first
-        Transform targetSpawn = npcSpawnPoints[Random.Range(0, npcSpawnPoints.Length)];
-        targetNPC = SpawnSingleNPC(targetSpawn, uniqueModel);
+        // Spawn the target NPC at the player spawn position
+        targetNPC = SpawnSingleNPC(playerSpawnPosition, uniqueModel);
 
-        // Now spawn the rest
+        // Spawn the remaining NPCs nearby
         for (int i = 1; i < npcCount; i++)
         {
-            Transform spawn = npcSpawnPoints[Random.Range(0, npcSpawnPoints.Length)];
-
             // Pick a model, but avoid the unique target model
             GameObject randomModel;
             do
             {
                 randomModel = npcModelPrefabs[Random.Range(0, npcModelPrefabs.Length)];
             }
-            while (randomModel == uniqueModel); // Prevent duplicates of the unique model
+            while (randomModel == uniqueModel);
 
-            SpawnSingleNPC(spawn, randomModel);
+            // Spawn within 1–2 units radius around player spawn to avoid stacking exactly
+            Vector3 spawnPos = playerSpawnPosition + new Vector3(
+                Random.Range(-2f, 2f),
+                0f,
+                Random.Range(-2f, 2f)
+            );
+
+            SpawnSingleNPC(spawnPos, randomModel);
         }
     }
 
-    GameObject SpawnSingleNPC(Transform spawnPoint, GameObject modelPrefab)
+    GameObject SpawnSingleNPC(Vector3 spawnPos, GameObject modelPrefab)
     {
-        GameObject npc = Instantiate(npcBasePrefab, spawnPoint.position, spawnPoint.rotation);
+        GameObject npc = Instantiate(npcBasePrefab, spawnPos, Quaternion.identity);
 
         // Spawn model under NPC
         GameObject modelInstance = Instantiate(modelPrefab, npc.transform);
         modelInstance.transform.localPosition = Vector3.zero;
 
-        // Assign wandering area
-        BoxCollider area = wanderingAreas[Random.Range(0, wanderingAreas.Length)];
-        npc.GetComponent<NPCMovementBehavior>().SetWanderArea(area);
+        // The new NPCMovementBehavior already uses the spawn position,
+        // so no need to assign a BoxCollider or call SetWanderArea
 
         return npc;
     }

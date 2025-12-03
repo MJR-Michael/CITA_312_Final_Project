@@ -1,14 +1,32 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PlayerReaction : MonoBehaviour
 {
-    private bool canReact = false;
+    [Header("Reaction Input")]
+    public InputAction reactionAction;
+
+    private bool canReact = false;        // true only after clock hits 12
     private bool playerHasReacted = false;
+    private bool roundStarted = false;    // becomes true at start of scene
 
     public System.Action OnPlayerReacted;
+    public System.Action OnPlayerEarly;
+
+    void OnEnable()
+    {
+        reactionAction.Enable();
+    }
+
+    void OnDisable()
+    {
+        reactionAction.Disable();
+    }
 
     void Start()
     {
+        roundStarted = true;
+
         ClockManager clock = FindFirstObjectByType<ClockManager>();
 
         clock.OnClockStrike12 += () =>
@@ -20,10 +38,21 @@ public class PlayerReaction : MonoBehaviour
 
     void Update()
     {
-        if (canReact && !playerHasReacted)
+        // Only care about player input if round has begun
+        if (!playerHasReacted && roundStarted)
         {
-            if (Input.GetKeyDown(KeyCode.Space)) // Your reaction key
+            if (reactionAction.WasPerformedThisFrame())
             {
+                // Player pressed too early (before 12:00)
+                if (!canReact)
+                {
+                    Debug.Log("PLAYER reacted too early!");
+                    playerHasReacted = true;
+                    OnPlayerEarly?.Invoke();
+                    return;
+                }
+
+                // Player pressed at correct time (after 12:00)
                 playerHasReacted = true;
                 canReact = false;
 

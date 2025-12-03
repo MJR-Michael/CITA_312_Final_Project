@@ -3,21 +3,27 @@ using System;
 
 public class ClockManager : MonoBehaviour
 {
+    [Header("Clock Hands")]
     public Transform hourHand;
     public Transform minuteHand;
     public Transform secondHand;
 
-    public AudioSource audioSource;   // Add this
-    public AudioClip chimeSound;      // Sound to play at 12
+    [Header("Chime Settings")]
+    public AudioSource audioSource;
+    public AudioClip chimeSound;
+
+    [Header("Random Start Time (Seconds Before 12:00)")]
+    public int minSecondsBeforeNoon = 10;   // Editable in inspector
+    public int maxSecondsBeforeNoon = 30;   // Editable in inspector
 
     private DateTime currentTime;
-    private bool hasRung = false;     // Prevents multiple triggers
-    public event Action OnClockStrike12;
+    private bool hasRung = false;
 
+    public event Action OnClockStrike12;
 
     void Start()
     {
-        int randomOffset = UnityEngine.Random.Range(10, 31); // 10–30 sec before 12:00
+        int randomOffset = UnityEngine.Random.Range(minSecondsBeforeNoon, maxSecondsBeforeNoon + 1);
         currentTime = DateTime.Today.AddHours(12).AddSeconds(-randomOffset);
 
         SetClockHands(currentTime);
@@ -49,7 +55,7 @@ public class ClockManager : MonoBehaviour
             audioSource.PlayOneShot(chimeSound);
             hasRung = true;
 
-            OnClockStrike12?.Invoke(); // Fire event
+            OnClockStrike12?.Invoke();
         }
     }
 }
