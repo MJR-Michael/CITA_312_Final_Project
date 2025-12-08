@@ -6,6 +6,11 @@ public class PlayerReaction : MonoBehaviour
     [Header("Reaction Input")]
     public InputAction reactionAction;
 
+    [Header("Audio")]
+    public AudioSource reactionAudioSource; // Assign an AudioSource in the inspector
+    public AudioClip correctReactionClip;   // Sound for correct reaction
+    public AudioClip earlyReactionClip;     // Sound for early reaction
+
     private bool canReact = false;        // true only after clock hits 12
     private bool playerHasReacted = false;
     private bool roundStarted = false;    // becomes true at start of scene
@@ -49,6 +54,10 @@ public class PlayerReaction : MonoBehaviour
                     Debug.Log("PLAYER reacted too early!");
                     playerHasReacted = true;
                     OnPlayerEarly?.Invoke();
+
+                    if (reactionAudioSource && earlyReactionClip)
+                        reactionAudioSource.PlayOneShot(earlyReactionClip);
+
                     return;
                 }
 
@@ -58,7 +67,18 @@ public class PlayerReaction : MonoBehaviour
 
                 Debug.Log("PLAYER reacted!");
                 OnPlayerReacted?.Invoke();
+
+                if (reactionAudioSource && correctReactionClip)
+                    reactionAudioSource.PlayOneShot(correctReactionClip);
             }
         }
+    }
+
+    /// <summary>
+    /// Returns true if the player reacted correctly (after clock hit 12)
+    /// </summary>
+    public bool HasReactedCorrectly()
+    {
+        return playerHasReacted && !canReact;
     }
 }

@@ -32,6 +32,13 @@ public class NPCSpawnManager : MonoBehaviour
         // Spawn the target NPC at the player spawn position
         targetNPC = SpawnSingleNPC(playerSpawnPosition, uniqueModel);
 
+        // 🔹 ADDED: Spawn visual clone of the target's model (no AI, no NPC logic)
+        GameObject targetClone = Instantiate(
+            uniqueModel,
+            playerSpawnPosition + new Vector3(1f, 0f, 0f),    // Offset: 1 unit to the right
+            Quaternion.identity
+        );
+
         // Spawn the remaining NPCs nearby
         for (int i = 1; i < npcCount; i++)
         {
@@ -43,7 +50,7 @@ public class NPCSpawnManager : MonoBehaviour
             }
             while (randomModel == uniqueModel);
 
-            // Spawn within 1–2 units radius around player spawn to avoid stacking exactly
+            // Spawn within 1–2 units radius around the player spawn
             Vector3 spawnPos = playerSpawnPosition + new Vector3(
                 Random.Range(-2f, 2f),
                 0f,
@@ -61,9 +68,6 @@ public class NPCSpawnManager : MonoBehaviour
         // Spawn model under NPC
         GameObject modelInstance = Instantiate(modelPrefab, npc.transform);
         modelInstance.transform.localPosition = Vector3.zero;
-
-        // The new NPCMovementBehavior already uses the spawn position,
-        // so no need to assign a BoxCollider or call SetWanderArea
 
         return npc;
     }

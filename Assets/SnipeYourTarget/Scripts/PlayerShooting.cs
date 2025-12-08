@@ -8,13 +8,14 @@ public class PlayerCombat : MonoBehaviour
 
     [Header("Shoot Settings")]
     public float shootRange = 1000f;
-    
+
     [Header("Scope Settings")]
     public float scopedFOV = 150f;
     public float normalFOV = 80f;
     public float scopeSpeed = 20f;
 
     bool isScoped = false;
+    bool hasShotWrongNPC = false; // track wrong NPC shots
 
     SnipeActions input;
 
@@ -35,9 +36,14 @@ public class PlayerCombat : MonoBehaviour
     }
 
     // -- SHOOTING ---------------------------------------------------------------
-
     void TryShoot()
     {
+        if (hasShotWrongNPC)
+        {
+            Debug.Log("You already shot the wrong NPC! No more shots.");
+            return;
+        }
+
         if (!isScoped)
         {
             Debug.Log("Cannot shoot unless scoped!");
@@ -50,21 +56,26 @@ public class PlayerCombat : MonoBehaviour
         {
             Debug.Log("You hit: " + hit.collider.name);
 
-            // example: NPC checking
             var npc = hit.collider.GetComponentInParent<NPCIdentifier>();
             if (npc != null)
             {
                 npc.OnShotByPlayer();
+
+                // If it's the wrong NPC, block further shots
+                if (!npc.isTarget)
+                {
+                    hasShotWrongNPC = true;
+                }
             }
         }
         else
         {
             Debug.Log("Missed shot");
+            // Do NOT block shooting here
         }
     }
 
     // -- SCOPING ---------------------------------------------------------------
-
     void ToggleScope()
     {
         isScoped = !isScoped;
@@ -73,8 +84,6 @@ public class PlayerCombat : MonoBehaviour
     void HandleScopeFOV()
     {
         float targetFov = isScoped ? scopedFOV : normalFOV;
-
-        playerCamera.fieldOfView =
-            Mathf.Lerp(playerCamera.fieldOfView, targetFov, Time.deltaTime * scopeSpeed);
+        playerCamera.fieldOfView = Mathf.Lerp(playerCamera.fieldOfView, targetFov, Time.deltaTime * scopeSpeed);
     }
 }

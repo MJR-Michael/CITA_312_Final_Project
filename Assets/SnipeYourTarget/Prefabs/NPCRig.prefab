@@ -78,8 +78,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c59cbf5985c32b221b8244c8a132247d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NPCMovementBehavior
-  wanderArea: {fileID: 0}
+  wanderRadius: 60
   wanderDelay: 3
+  stoppingDistance: 0.5
+  maxAttempts: 20
 --- !u!114 &3129706090926839754
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -93,6 +95,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NPCIdentifier
   isTarget: 0
+  manager: {fileID: 8487520423258107223, guid: a8b90adedf97f49a3863feac2b0c387c, type: 3}
 --- !u!195 &4965096346348645063
 NavMeshAgent:
   m_ObjectHideFlags: 0

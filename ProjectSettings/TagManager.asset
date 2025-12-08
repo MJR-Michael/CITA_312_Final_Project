@@ -6,6 +6,7 @@ TagManager:
   tags:
   - SoccerBall
   - Ball
+  - Goalie
   layers:
   - Default
   - TransparentFX

@@ -5,9 +5,36 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
+  - enabled: 0
+    path: Assets/MainMenu/Scene/bootstrap.unity
+    guid: fd34a14b65c602ce080db96515081899
   - enabled: 1
-    path: Assets/Scenes/SampleScene.unity
-    guid: 99c9720ab356a0642a771bea13969a05
+    path: Assets/MainMenu/Scene/MainMenu.unity
+    guid: 7061569f995fdcd0bb4cb66f0b2c0069
+  - enabled: 1
+    path: Assets/MainMenu/Scene/Tutorial.unity
+    guid: d6782f7d382c30362bef44e89a13b99e
+  - enabled: 1
+    path: Assets/MainMenu/Scene/Transition.unity
+    guid: 8825779769c4c005289e1254393f930e
+  - enabled: 1
+    path: Assets/MainMenu/Scene/Credits.unity
+    guid: 809566a90c32e0c2686b31bc9eecd7d0
+  - enabled: 1
+    path: Assets/BlockTheShot/Scene/BlockTheShot.unity
+    guid: f42de0fc91acb644181f24bd7b167a6e
+  - enabled: 1
+    path: Assets/DefeatAllEnemies/Scene/DefeatAllEnemies.unity
+    guid: 8a7e7ab918496df0b9c340a482fb613e
+  - enabled: 1
+    path: Assets/DodgeTheKiller/Scene/DodgeTheKiller.unity
+    guid: c855200201c73ae84b2e579eafadb5ec
+  - enabled: 1
+    path: Assets/HighNoon/Scene/HighNoon.unity
+    guid: 04a0c024b02e4fbc3a9e037c43513fcb
+  - enabled: 1
+    path: Assets/SnipeYourTarget/Scene/SnipeYourTarget.unity
+    guid: 7e6d3f4e5d896154ab4438845532ac3e
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_UseUCBPForAssetBundles: 0

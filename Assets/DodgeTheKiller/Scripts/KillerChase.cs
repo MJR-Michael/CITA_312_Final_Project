@@ -1,75 +1,109 @@
 using UnityEngine;
 using UnityEngine.AI;
+using TMPro; // For TextMeshPro
 
-public class KillerChase : MonoBehaviour
+public class NPCKillerChase : MonoBehaviour
 {
-    public Transform player;     // Drag your player into this field
-    public float catchDistance = 1.5f;  // Distance needed to trigger game over
-    public float turnSpeed = 10f;       // Speed at which the enemy turns (adjust for tighter turns)
+    [Header("Chase Settings")]
+    public string playerTag = "Player";
+    public float turnSpeed = 10f;
     public float angularSpeed = 500f;
     public float acceleration = 10f;
 
+    public MinigameManager manager;
+
+    [Header("Survival Timer")]
+    [SerializeField] private float minSurvivalTime = 5f;
+    [SerializeField] private float maxSurvivalTime = 10f;
+
+    public string timerTextName = "TimerText"; // Name of your Timer Text GameObject
+    private TMP_Text timerText;
+
     private NavMeshAgent agent;
+    private Transform player;
+    private float timer;
+    private float timeToWin;
+    private bool chaseActive = true;
 
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
+        agent.angularSpeed = angularSpeed;
+        agent.acceleration = acceleration;
+        agent.stoppingDistance = 0.5f;
+        agent.radius = 0.5f;
 
-        // Adjust NavMeshAgent properties for tight turns
-        agent.angularSpeed = angularSpeed;    // Faster turning
-        agent.acceleration = acceleration;     // More acceleration
-        agent.stoppingDistance = catchDistance; // Adjust to stop when near the player
-        agent.radius = 0.5f;          // Smaller radius for tighter navigation
+        GameObject playerObj = GameObject.FindGameObjectWithTag(playerTag);
+        if (playerObj != null)
+            player = playerObj.transform;
+        else
+            Debug.LogError("Player not found!");
+
+        // Find the TimerText dynamically
+        GameObject timerObj = GameObject.Find(timerTextName);
+        if (timerObj != null)
+            timerText = timerObj.GetComponent<TMP_Text>();
+        else
+            Debug.LogWarning("Timer Text not found in scene!");
+
+        // Random survival time between min and max
+        timeToWin = Random.Range(minSurvivalTime, maxSurvivalTime);
+        timer = 0f;
     }
 
     void Update()
     {
-        if (player != null)
+        if (player == null || !chaseActive) return;
+
+        // Update timer
+        timer += Time.deltaTime;
+        float timeLeft = Mathf.Max(timeToWin - timer, 0f);
+
+        if (timerText != null)
+            timerText.text = $"Time Left: {timeLeft:F1}s";
+
+        if (timer >= timeToWin)
         {
-            // Get the position of the player, ignoring Y-axis
-            Vector3 targetPosition = player.position;
-            targetPosition.y = transform.position.y; // Keep enemy on same Y level
-
-            // Set the destination of the NavMeshAgent towards the player (X and Z only)
-            agent.SetDestination(targetPosition);
-
-            // Calculate the distance to the player
-            float distance = Vector3.Distance(transform.position, player.position);
-
-            // If the enemy is close enough to the player, trigger Game Over
-            if (distance <= catchDistance)
-            {
-                GameOver();
-            }
-
-            // Smoothly rotate the enemy towards the player
-            RotateTowardsPlayer(targetPosition);
+            PlayerWins();
+            return;
         }
+
+        // Move towards player
+        Vector3 targetPos = player.position;
+        targetPos.y = transform.position.y;
+        agent.SetDestination(targetPos);
+
+        RotateTowardsPlayer(targetPos);
     }
 
-    void RotateTowardsPlayer(Vector3 targetPosition)
+    void RotateTowardsPlayer(Vector3 targetPos)
     {
-        // Calculate direction to player on X and Z axis
-        Vector3 directionToPlayer = targetPosition - transform.position;
-        directionToPlayer.y = 0; // Ignore Y-axis rotation
-
-        if (directionToPlayer.sqrMagnitude > 0.01f) // Check if the player is far enough to rotate
+        Vector3 direction = targetPos - transform.position;
+        direction.y = 0;
+        if (direction.sqrMagnitude > 0.01f)
         {
-            // Smoothly rotate towards the player on the X and Z axes
-            Quaternion targetRotation = Quaternion.LookRotation(directionToPlayer);
+            Quaternion targetRotation = Quaternion.LookRotation(direction);
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, turnSpeed * Time.deltaTime);
         }
     }
 
-    void GameOver()
+    public void PlayerCaught()
     {
-        // Stop enemy movement
+        if (!chaseActive) return;
+        chaseActive = false;
         agent.isStopped = true;
+        if (timerText != null) timerText.text = "GAME OVER!";
+        Debug.Log("GAME OVER! Killer caught the player.");
+        manager.LoseMinigame();
+    }
 
-        // Trigger game over logic (e.g., show UI, reload scene, etc.)
-        Debug.Log("GAME OVER!");
-
-        // Example: Reload the scene (optional, comment out if not needed)
-        // SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    void PlayerWins()
+    {
+        if (!chaseActive) return;
+        chaseActive = false;
+        agent.isStopped = true;
+        if (timerText != null) timerText.text = "PLAYER WINS!";
+        Debug.Log("PLAYER WINS! Killer didn't catch the player in time.");
+        manager.WinMinigame();
     }
 }
