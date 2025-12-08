@@ -65,7 +65,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Current Game:'
+  m_text: 'Current Game: High Noon'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -204,7 +204,7 @@ MonoBehaviour:
   - {fileID: 6194323636387741293}
   - {fileID: 1779548782233535667}
   - {fileID: 1288981754962419213}
-  heartsCount: 3
+  heartsCount: 0
   trueGameOverSceneName: Transition
 --- !u!1 &1679183018204235873
 GameObject:
@@ -271,7 +271,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Score: '
+  m_text: 'Trophies: 1'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -407,7 +407,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Next Game: '
+  m_text: 'Next Game: Snipe Your Target'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -881,6 +881,10 @@ PrefabInstance:
     - target: {fileID: 3377222034815507000, guid: 6c8e1bbdff3294d8a87a17640a91c144, type: 3}
       propertyPath: m_Name
       value: Heart
+      objectReference: {fileID: 0}
+    - target: {fileID: 3377222034815507000, guid: 6c8e1bbdff3294d8a87a17640a91c144, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4922684131207820521, guid: 6c8e1bbdff3294d8a87a17640a91c144, type: 3}
       propertyPath: m_Pivot.x

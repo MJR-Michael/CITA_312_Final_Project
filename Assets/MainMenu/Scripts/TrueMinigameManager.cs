@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
@@ -27,10 +26,6 @@ public class MinigameManager : MonoBehaviour
 
     private int currentMinigameIndex = -1;
 
-    void Awake()
-    {
-        DontDestroyOnLoad(gameObject);
-    }
 
     void Start()
     {
@@ -38,6 +33,7 @@ public class MinigameManager : MonoBehaviour
         ShowNextMinigame();
         UpdateHeartsUI();
         UpdateScoreUI();
+        //LoadCurrentMinigameScene();
     }
 
     // Creates a new shuffled queue of all minigames
@@ -56,15 +52,17 @@ public class MinigameManager : MonoBehaviour
         }
     }
 
-    // Picks the next minigame from the queue
+    // Picks the next minigame from the queue. If empty → regenerate but keep score/hearts.
     void ShowNextMinigame()
     {
+        // If we have played all minigames once, start a new shuffled batch
         if (minigameQueue.Count == 0)
             StartNewQueue();
 
         currentMinigameIndex = minigameQueue[0];
         minigameQueue.RemoveAt(0);
 
+        // Update UI
         currentGameText.text = "Current Game: " + minigameNames[currentMinigameIndex];
 
         if (minigameQueue.Count > 0)
@@ -78,9 +76,13 @@ public class MinigameManager : MonoBehaviour
         string sceneToLoad = minigameSceneNames[currentMinigameIndex];
 
         if (!string.IsNullOrEmpty(sceneToLoad))
+        {
             SceneManager.LoadScene(sceneToLoad);
+        }
         else
+        {
             Debug.LogError("Invalid scene name at index: " + currentMinigameIndex);
+        }
     }
 
     public void WinMinigame()
@@ -97,23 +99,16 @@ public class MinigameManager : MonoBehaviour
         heartsCount--;
         UpdateHeartsUI();
 
-        // Wait 5 seconds before loading next minigame
-        StartCoroutine(LoadNextMinigameAfterDelay());
-
         if (heartsCount <= 0)
         {
             LoadTrueGameOver();
             return;
         }
-    }
-
-    private IEnumerator LoadNextMinigameAfterDelay()
-    {
-        yield return new WaitForSeconds(5f); // delay
 
         ShowNextMinigame();
         LoadCurrentMinigameScene();
     }
+
 
     void UpdateHeartsUI()
     {

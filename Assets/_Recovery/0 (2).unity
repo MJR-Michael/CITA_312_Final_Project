@@ -1780,22 +1780,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: TrueMinigameMan
       objectReference: {fileID: 0}
-    - target: {fileID: 4573412197516349628, guid: a8b90adedf97f49a3863feac2b0c387c, type: 3}
-      propertyPath: m_AnchorMax.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4573412197516349628, guid: a8b90adedf97f49a3863feac2b0c387c, type: 3}
-      propertyPath: m_AnchorMin.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4573412197516349628, guid: a8b90adedf97f49a3863feac2b0c387c, type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4573412197516349628, guid: a8b90adedf97f49a3863feac2b0c387c, type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 8487520423258107223, guid: a8b90adedf97f49a3863feac2b0c387c, type: 3}
       propertyPath: heartsCount
       value: 3
